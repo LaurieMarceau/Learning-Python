@@ -1,5 +1,5 @@
-# Python-For-Fun
-The scripts I wrote to try stuff
+# Python for fun
+Scripts wrote to try something new or showcase a problem I had to solve.
 
 ## Here is the current list of what I did:
 - RetrieveWordsURL.py: A script that retrieves words from a URL and print them.
