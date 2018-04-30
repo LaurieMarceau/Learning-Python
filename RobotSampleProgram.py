@@ -1,9 +1,9 @@
 #!/usr/bin/python3
 """Connect to a Meca500 robot, activate and home it,
-send movements, deactivate and then close the connection.
+send a small program and then close the connection.
 
 Usage:
-    python sample_program.py
+    python RobotSampleProgram.py
 """
 
 import time
@@ -22,12 +22,24 @@ def main_program():
     robot_connect()
     print("Running program main_program...")
     sys.stdout.flush()
+
+    # Set parameters
+    robot.run('SetCartAngVel', [80])
+    robot.run('SetCartLinVel', [100])
+    robot.run('SetJointVel', [10])
+    robot.run('SetCartAcc', [10])
+    robot.run('SetJointAcc', [10])
+    robot.run('SetBlending', [10])
+    robot.run('SetAutoConf', [1])
+    # Movements
     robot.run('MoveJoints', [-20.000, 10.000, -10.000, 20.000, -10.000, -10.000])
     robot.run('MoveJoints', [20.000, -10.000, 10.000, -20.000, 20.000, -10.000])
     robot.run('MoveJoints', [-20.000, 10.000, -10.000, 20.000, -10.000, -10.000])
     robot.run('MoveJoints', [0.000, -20.000, 20.000, 0.000, 20.000, 0.000])
     robot.wait_for('3012', 'Did not receive EOB')
     robot.run('GetJoints')
+    robot.get_response()
+    robot.run('Delay', [1])
     robot.run('DeactivateRobot')
     print("Main_program done")
     sys.stdout.flush()
@@ -87,12 +99,20 @@ class MecaRobot:
             str_send = cmd
         else:
             str_send = cmd + '(' + str(values) + ')'
-        
-        print('Running: ' + str_send)
-        sys.stdout.flush()
-        
+
         # Send command to robot
         self.send_str(str_send)
+
+        print('Running: ' + str_send)
+        sys.stdout.flush()
+
+    def get_response(self):
+        robot_answer = ""
+        while robot_answer == "":
+            robot_answer = self.receive_str()
+
+        print('Received: %s' % robot_answer)
+        sys.stdout.flush()
 
     def wait_for(self, answer, error_message):
         answer_timer = Timer(10, self.answer_not_found, args=error_message)
